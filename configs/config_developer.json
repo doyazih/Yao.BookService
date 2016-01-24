@@ -1,4 +1,4 @@
 {
 	"WEB_PORT": 8080,
-	"ROOT_PATH": "/Volumes/My Passport/Comics"
+	"COMICS_ROOT_PATH": "/Volumes/My Passport/Comics"
 }

@@ -1,4 +1,4 @@
 {
 	"WEB_PORT": 3000,
-	"ROOT_PATH": "C:\\shared\\Comics"
+	"COMICS_ROOT_PATH": "C:\\shared\\Comics"
 }
