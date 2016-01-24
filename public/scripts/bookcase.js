@@ -1,5 +1,6 @@
 
 var isInit = false;
+var lastClickedPage;
 
 $(document).ready(function() {
 	InitPage();
@@ -8,6 +9,7 @@ $(document).ready(function() {
 function InitPage()
 {
 	InitCollections();
+	InitButton();
 };
 
 function InitCollections()
@@ -64,6 +66,8 @@ function SetTitles(e) {
 			}
 		});
 		
+		SetLable(categoryName);
+		
 		$(e).next().show();
 	}
 	else {
@@ -80,7 +84,7 @@ function SetVolumes(e) {
 		
 		var bookTitle = $(e).text();
 		var bookTitleID = $(e).attr('id');
-		
+				
 		$.ajax('/api/book/categories/' + categoryName + '/titles/' + bookTitle + '/volumes', {
 			method: 'GET',
 			success: function (data, status) {
@@ -101,7 +105,8 @@ function SetVolumes(e) {
 				}
 			}
 		});
-		
+
+		SetLable(categoryName, bookTitle);
 
 		$(e).next().show();
 	
@@ -137,6 +142,7 @@ function SetPages(e) {
 						
 							$('#' + pageID).click(function () {
 								SetContent(this);
+								lastClickedPage = $(this);
 							});
 						
 						});
@@ -144,7 +150,7 @@ function SetPages(e) {
 				}
 			}
 		});
-		
+		SetLable(categoryName, bookTitle, volume);
 		$(e).next().show();
 	}
 	else {
@@ -162,25 +168,71 @@ function SetContent(e) {
 	
 	var imgLink = 'http://' + document.location.host + '/api/book/categories/' + categoryName + '/titles/' + bookTitle + '/volumes/' + volume + '/pages/' + page;
 	
+	SetLable(categoryName, bookTitle, volume, page);
+	
 	$('#imgContent').attr('src', imgLink);
 	
 };
 
+function SetLable(category, title, volume, page) {
+	var lableInfo = '';
+	
+	if(category)
+		lableInfo += (category);
+	
+	if(title)
+		lableInfo += ('/' + title);
+	
+	if(volume)
+		lableInfo += ('/' + volume);
+	
+	if(page)
+		lableInfo += ('/' + page);
+	
+	$('#lableContentInfo').text(lableInfo);
+	
+};
+
+function GoNextPage() {
+	var nextPage = lastClickedPage.parent().next().find('.page');
+	
+	if(!nextPage || nextPage.length == 0)
+		alert('Last page\nPlease go next volume.');
+	else
+		nextPage.trigger('click');
+};
+
+function BackPrevPage() {
+	var prevPage = lastClickedPage.parent().prev().find('.page');
+	
+	if(!prevPage || prevPage.length == 0)
+		alert('First page\nPlease go next page.');
+	else
+		prevPage.trigger('click');
+};
+
 function InitButton() {
 	
-	if(isInit)
-		return;
-	else {	
-		isInit = true;
-		$('.category, .book-title, .volume').click(function (e) {
-			
-			var list = $(this).next();
-			
-			if(list.css('display') == 'none')
-				list.show();
-			else
-				list.hide();
-		});	
-	}
-
+	$('#imgContent').click(function (e) {
+		GoNextPage();
+	});
+	
+	$('#aNextPage').click(function (e) {
+		GoNextPage();
+	});
+	
+	$('#aPrevPage').click(function (e) {
+		BackPrevPage();
+	});
+	
+	$('#aSideMenuToggle').click(function (e) {
+		
+		if($('#sidebar').css('display') == 'none') {
+			$('div.container').css('margin', '5px 0 50px 230px');
+		}
+		else {
+			$('div.container').css('margin', '5px 0 50px 10px');
+		}
+		$('#sidebar').toggle(200);
+	});
 };
