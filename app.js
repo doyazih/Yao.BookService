@@ -35,6 +35,8 @@ if ('development' == app.get('env')) {
 //View
 app.get('/', homeController.Index);
 app.get('/bookcase', bookController.Index);
+app.get('/bookcase/introduction', bookController.Introduction);
+
 
 //Api
 app.get('/api/book/categories', bookApiController.GetCategories);

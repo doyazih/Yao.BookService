@@ -1,5 +1,14 @@
-extends layout
-
-block content
-  h1= title
-  p Welcome to #{title}
+doctype html
+html
+	head
+		title= title
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(src='http://code.jquery.com/jquery-1.11.1.min.js')
+	body
+		h1= title
+		p Welcome to #{title}
+	
+		h4 Please click service on the link provided below.
+			ul
+				li
+					a(href="/bookcase") Book case service
