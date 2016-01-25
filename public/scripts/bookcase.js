@@ -2,6 +2,7 @@
 var isInit = false;
 var lastClickedPage;
 var hashObj;
+var isShowTwoPages = false;
 
 $(document).ready(function() {
 	InitPage();
@@ -14,11 +15,14 @@ function InitPage()
 	if(hash && hash != '' && hash.startsWith('#'))
 		hashObj = hash.replace('#', '').replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
 
+	if(hashObj && hashObj.twopages == 'on')
+		isShowTwoPages = true;
+
+	if(hashObj && hashObj.sidebar == 'off')
+		$('#aSideMenuToggle').trigger('click');
+	
 	InitCollections();
 	InitButton();
-	
-	if(hashObj.sidebar == 'off')
-		$('#aSideMenuToggle').trigger('click');
 };
 
 function InitCollections()
@@ -213,6 +217,7 @@ function SetContent(e) {
 	var nextPage = lastClickedPage.parent().next().find('.page').text();
 	
 	var imgLink = 'http://' + document.location.host + '/api/book/categories/' + categoryName + '/titles/' + bookTitle + '/volumes/' + volume + '/pages/' + page;
+	var nextImgLink = 'http://' + document.location.host + '/api/book/categories/' + categoryName + '/titles/' + bookTitle + '/volumes/' + volume + '/pages/' + nextPage;
 	
 	SetLable(categoryName, bookTitle, volume, page);
 	
@@ -224,12 +229,30 @@ function SetContent(e) {
 		hrefLink += '&sidebar=off';
 		hrefPrevLink += '&sidebar=off';
 		hrefNextLink += '&sidebar=off';
+		
+		if(document.location.hash.indexOf('&sidebar=off') < 0)
+			$('#aSideMenuToggle').attr('href', document.location.hash += '&sidebar=off')
 	}
 	
+	if(isShowTwoPages) {
+		hrefLink += '&twopages=on';
+		hrefPrevLink += '&twopages=on';
+		hrefNextLink += '&twopages=on';
+	}
+
 	$('#aPrevPage').attr('href', hrefPrevLink);
 	$('#aNextPage').attr('href', hrefNextLink);
 	$('#aImageContent').attr('href', hrefLink);
+	
 	$('#imgContent').attr('src', imgLink);
+
+	if(isShowTwoPages) {
+		if(document.location.hash.indexOf('&twopages=on') < 0)
+			$('#aShowTwoPages').attr('href', document.location.hash += '&twopages=on')
+		$('#imgLeftContent').attr('src', nextImgLink);
+		$('#imgLeftContent').show();
+	}
+	
 };
 
 function SetLable(category, title, volume, page) {
@@ -252,7 +275,7 @@ function SetLable(category, title, volume, page) {
 };
 
 function GoNextPage() {
-	var nextPage = lastClickedPage.parent().next().find('.page');
+	var nextPage = isShowTwoPages ? lastClickedPage.parent().next().next().find('.page') : lastClickedPage.parent().next().find('.page');
 	
 	if(!nextPage || nextPage.length == 0)
 		alert('Last page\nPlease go next volume.');
@@ -261,7 +284,7 @@ function GoNextPage() {
 };
 
 function BackPrevPage() {
-	var prevPage = lastClickedPage.parent().prev().find('.page');
+	var prevPage = isShowTwoPages ? lastClickedPage.parent().prev().prev().find('.page') : lastClickedPage.parent().prev().find('.page');
 	
 	if(!prevPage || prevPage.length == 0)
 		alert('First page\nPlease go next page.');
@@ -292,5 +315,21 @@ function InitButton() {
 			$('div.container').css('margin', '5px 0 50px 10px');
 		}
 		$('#sidebar').toggle(200);
+	});
+	
+	$('#aShowTwoPages').click(function (e) {
+		if(isShowTwoPages) {
+			$('#aShowTwoPages').text('··');
+			$('#aShowTwoPages').attr('title', 'Show two pages');
+			$('#imgLeftContent').hide();
+			isShowTwoPages = false;
+		}
+		else {
+			$('#aShowTwoPages').text('·');
+			$('#aShowTwoPages').attr('title', 'Show one page');
+			$('#imgLeftContent').show();
+			isShowTwoPages = true;
+		}
+		SetContent(lastClickedPage);
 	});
 };
