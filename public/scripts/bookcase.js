@@ -16,6 +16,9 @@ function InitPage()
 
 	InitCollections();
 	InitButton();
+	
+	if(hashObj.sidebar == 'off')
+		$('#aSideMenuToggle').trigger('click');
 };
 
 function InitCollections()
@@ -173,8 +176,8 @@ function SetPages(e) {
 							$(e).next().append('<li class="page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a id="' + pageID + '" href="#category=' + categoryName + '&title=' + bookTitle + '&volume=' + volume + '&page=' + page + '" class="page">' + page + '</a></li>')			
 						
 							$('#' + pageID).click(function () {
-								SetContent(this);
 								lastClickedPage = $(this);
+								SetContent(this);
 							});
 						
 						});
@@ -206,13 +209,27 @@ function SetContent(e) {
 	var bookTitle = $(e).parents('.title').find('a.title').text();
 	var volume = $(e).parents('.volume').find('a.volume').text();
 	var page = $(e).parents('.page').find('a.page').text();
+	var prevPage = lastClickedPage.parent().prev().find('.page').text();
+	var nextPage = lastClickedPage.parent().next().find('.page').text();
 	
 	var imgLink = 'http://' + document.location.host + '/api/book/categories/' + categoryName + '/titles/' + bookTitle + '/volumes/' + volume + '/pages/' + page;
 	
 	SetLable(categoryName, bookTitle, volume, page);
 	
-	$('#imgContent').attr('src', imgLink);
+	var hrefLink = '#category=' + categoryName + '&title=' + bookTitle + '&volume=' + volume + '&page=' + page;
+	var hrefPrevLink = '#category=' + categoryName + '&title=' + bookTitle + '&volume=' + volume + '&page=' + prevPage;
+	var hrefNextLink = '#category=' + categoryName + '&title=' + bookTitle + '&volume=' + volume + '&page=' + nextPage;
 	
+	if($('#sidebar').css('display') == 'none') {
+		hrefLink += '&sidebar=off';
+		hrefPrevLink += '&sidebar=off';
+		hrefNextLink += '&sidebar=off';
+	}
+	
+	$('#aPrevPage').attr('href', hrefPrevLink);
+	$('#aNextPage').attr('href', hrefNextLink);
+	$('#aImageContent').attr('href', hrefLink);
+	$('#imgContent').attr('src', imgLink);
 };
 
 function SetLable(category, title, volume, page) {
@@ -254,7 +271,7 @@ function BackPrevPage() {
 
 function InitButton() {
 	
-	$('#imgContent').click(function (e) {
+	$('#aImageContent').click(function (e) {
 		GoNextPage();
 	});
 	
