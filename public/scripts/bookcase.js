@@ -1,13 +1,19 @@
 
 var isInit = false;
 var lastClickedPage;
+var hashObj;
 
 $(document).ready(function() {
 	InitPage();
 });
 
 function InitPage()
-{
+{	
+	var hash = document.location.hash;
+	
+	if(hash && hash != '' && hash.startsWith('#'))
+		hashObj = hash.replace('#', '').replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
+
 	InitCollections();
 	InitButton();
 };
@@ -17,7 +23,7 @@ function InitCollections()
 	$.ajax('/api/book/categories', {
 		method: 'GET',
 		success: function (data, status) {
-			if(status == 'success') {
+			if(status == HTTP_RESPONSE_STATUS.Success) {
 
 				if(data && Array.isArray(data) && data.length > 0) {
 					data.forEach(function (category, idx) {
@@ -25,13 +31,21 @@ function InitCollections()
 						var categoryName = category.Category;
 						var categoryID = 'book-' + category.Seq;
 						
-						$('#aCollections').next().append('<li class="category">- <a id="' + categoryID + '" href="#" class="category">' + categoryName + '</a><ul class="toc_section" style="display:none"></ul></li>');
+						$('#aCollections').next().append('<li class="category">- <a id="' + categoryID + '" href="#category=' + categoryName + '" class="category">' + categoryName + '</a><ul class="toc_section" style="display:none"></ul></li>');
 						
 						$('#' + categoryID).click(function () {
 							SetTitles(this);
 						});
 					});
-					
+
+					if(hashObj && hashObj.category) {
+						var category = $('a.category').filter(function () {
+							return $(this).text() == hashObj.category;
+						});
+						if (category && category.length > 0)
+							category.trigger('click');
+							
+					}					
 				}
 			}
 		}
@@ -48,19 +62,28 @@ function SetTitles(e) {
 		$.ajax('/api/book/categories/' + categoryName + '/titles', {
 			method: 'GET',
 			success: function (data, status) {
-				if(status == 'success') {
+				if(status == HTTP_RESPONSE_STATUS.Success) {
 					if(data && Array.isArray(data) && data.length > 0) {
 						data.forEach(function (book, idx) {
 							
 							var bookTitle = book.Title;
 							var bookTitleID = categoryID + '-' + book.Seq;
 							
-							$(e).next().append('<li class="title">&nbsp;&nbsp;- <a id="' + bookTitleID + '" href="#" class="title">' + bookTitle + '</a><ul class="toc_section" style="display:none"></ul></li>')			
+							$(e).next().append('<li class="title">&nbsp;&nbsp;- <a id="' + bookTitleID + '" href="#category=' + categoryName + '&title=' + bookTitle + '" class="title">' + bookTitle + '</a><ul class="toc_section" style="display:none"></ul></li>')			
 						
 							$('#' + bookTitleID).click(function() {
 								SetVolumes(this);
 							});
 						});
+
+						if(hashObj && hashObj.title) {
+							var title = $('a.title').filter(function () {
+								return $(this).text() == hashObj.title;
+							});
+							if (title && title.length > 0)
+								title.trigger('click');
+								
+						}
 					}
 				}
 			}
@@ -88,19 +111,28 @@ function SetVolumes(e) {
 		$.ajax('/api/book/categories/' + categoryName + '/titles/' + bookTitle + '/volumes', {
 			method: 'GET',
 			success: function (data, status) {
-				if(status == 'success') {
+				if(status == HTTP_RESPONSE_STATUS.Success) {
 					if(data && Array.isArray(data) && data.length > 0) {
 						data.forEach(function (vol, idx) {
 							
 							var volume = vol.Volume;
 							var volumeID = bookTitleID + '-' + vol.Seq;
 
-							$(e).next().append('<li class="volume">&nbsp;&nbsp;&nbsp;&nbsp;- <a id="' + volumeID + '" href="#" class="volume">' + volume + '</a><ul class="toc_section" style="display:none"></ul></li>')			
+							$(e).next().append('<li class="volume">&nbsp;&nbsp;&nbsp;&nbsp;- <a id="' + volumeID + '" href="#category=' + categoryName + '&title=' + bookTitle + '&volume=' + volume + '" class="volume">' + volume + '</a><ul class="toc_section" style="display:none"></ul></li>')			
 
 							$('#' + volumeID).click(function() {
 								SetPages(this);
 							});
 						});
+
+						if(hashObj && hashObj.volume) {
+							var volume = $('a.volume').filter(function () {
+								return $(this).text() == hashObj.volume;
+							});
+							if (volume && volume.length > 0)
+								volume.trigger('click');
+								
+						}
 					}
 				}
 			}
@@ -131,14 +163,14 @@ function SetPages(e) {
 		$.ajax('/api/book/categories/' + categoryName + '/titles/' + bookTitle + '/volumes/' + volume + '/pages', {
 			method: 'GET',
 			success: function (data, status) {
-				if(status == 'success') {
+				if(status == HTTP_RESPONSE_STATUS.Success) {
 					if(data && Array.isArray(data) && data.length > 0) {
 						data.forEach(function (p, idx) {
 							
 							var page = p.Page;
 							var pageID = volumeID + '-' + p.Seq;
 
-							$(e).next().append('<li class="page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a id="' + pageID + '" href="#" class="page">' + page + '</a></li>')			
+							$(e).next().append('<li class="page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <a id="' + pageID + '" href="#category=' + categoryName + '&title=' + bookTitle + '&volume=' + volume + '&page=' + page + '" class="page">' + page + '</a></li>')			
 						
 							$('#' + pageID).click(function () {
 								SetContent(this);
@@ -146,6 +178,15 @@ function SetPages(e) {
 							});
 						
 						});
+
+						if(hashObj && hashObj.page) {
+							var page = $('a.page').filter(function () {
+								return $(this).text() == hashObj.page;
+							});
+							if (page && page.length > 0)
+								page.trigger('click');
+								
+						}
 					}
 				}
 			}

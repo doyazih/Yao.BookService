@@ -7,9 +7,10 @@ var express = require('express')
   , http = require('http')
   , path = require('path');
 
-var config = process.env.NODE_ENV == 'developer' ? require('./configs/config_developer.json') : require('./configs/config.json')
+var config = process.env.NODE_ENV == 'development' ? require('./configs/config_development.json') : require('./configs/config.json')
 		global.config = config;
 
+var route = require('./routes/route.js')
 var homeController = require('./controllers/homeController.js')
 var bookController = require('./controllers/bookController.js')
 var bookApiController = require('./controllers/bookApiController.js')
@@ -34,7 +35,10 @@ if ('development' == app.get('env')) {
 
 //View
 app.get('/', homeController.Index);
-app.get('/bookcase', bookController.Index);
+app.get('/index', homeController.Index);
+app.get('/bookcase', bookController.Introduction);
+app.get('/bookcase/index', bookController.Introduction);
+app.get('/bookcase/collections', bookController.Index);
 app.get('/bookcase/introduction', bookController.Introduction);
 
 
@@ -43,8 +47,7 @@ app.get('/api/book/categories', bookApiController.GetCategories);
 app.get('/api/book/categories/:Category/titles', bookApiController.GetTitles);
 app.get('/api/book/categories/:Category/titles/:Title/volumes', bookApiController.GetVolumes);
 app.get('/api/book/categories/:Category/titles/:Title/volumes/:Volume/pages', bookApiController.GetPages);
-
-app.get('/api/book/categories/:Category/titles/:Title/volumes/:Volume/pages/:Page', bookApiController.GetBook);
+app.get('/api/book/categories/:Category/titles/:Title/volumes/:Volume/pages/:Page', bookApiController.GetPage);
 
 
 http.createServer(app).listen(app.get('port'), function(){

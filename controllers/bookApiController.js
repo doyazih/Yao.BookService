@@ -152,17 +152,17 @@ function GetPathList(p) {
 	return list;
 };
 
-exports.GetBook = function (req, res){
+exports.GetPage = function (req, res){
 	
 	var category = req.params.Category;
 	var title = req.params.Title;
 	var volume = req.params.Volume;
 	var page = req.params.Page;
 	
-	var bookPath;
+	var pagePath;
 
 	if(category == 'Comics')
-		bookPath = path.join(COMICS_ROOT_PATH, title, volume, page);
+		pagePath = path.join(COMICS_ROOT_PATH, title, volume, page);
 	
-	res.sendfile(bookPath);
+	res.sendfile(pagePath);
 };

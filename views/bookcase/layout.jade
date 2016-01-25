@@ -4,16 +4,17 @@ html
 		title= title
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		script(src='http://code.jquery.com/jquery-1.11.1.min.js')
+		script(src='/scripts/common.js')
 		block head
 	body
 		#sidebar(class='interface')
 			a(class='toc_title' href='#') Yao's Book case
-				span(class='version') (1.0.2)
+				span(class='version') (1.1.0)
 			ul(class='toc_section')
 				li
 					a(href='https://github.com/doyazih/Yao.BookService.git') GitHubRepository
 			a(class='toc_title', href='/bookcase/introduction') Introduction
-			a(id='aCollections', class='toc_title', href='/bookcase') Collections
+			a(id='aCollections', class='toc_title', href='/bookcase/collections') Collections
 			ul(class='toc_section')
 		block content
 	
