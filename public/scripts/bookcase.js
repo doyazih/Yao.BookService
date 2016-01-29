@@ -10,6 +10,8 @@ $(document).ready(function() {
 
 function InitPage()
 {	
+	InitButton();
+	
 	var hash = document.location.hash;
 	
 	if(hash && hash != '' && hash.startsWith('#'))
@@ -22,7 +24,6 @@ function InitPage()
 		$('#aSideMenuToggle').trigger('click');
 	
 	InitCollections();
-	InitButton();
 };
 
 function InitCollections()
@@ -248,7 +249,10 @@ function SetContent(e) {
 
 	if(isShowTwoPages) {
 		if(document.location.hash.indexOf('&twopages=on') < 0)
-			$('#aShowTwoPages').attr('href', document.location.hash += '&twopages=on')
+			$('#aShowTwoPages').attr('href', document.location.hash += '&twopages=on');
+
+		$('#aShowTwoPages').text('·');
+		$('#aShowTwoPages').attr('title', 'Show one page');
 		$('#imgLeftContent').attr('src', nextImgLink);
 		$('#imgLeftContent').show();
 	}
@@ -310,9 +314,12 @@ function InitButton() {
 		
 		if($('#sidebar').css('display') == 'none') {
 			$('div.container').css('margin', '5px 0 50px 230px');
+			$('#aSideMenuToggle').attr('href', document.location.hash = document.location.hash.replace('&sidebar=off', ''));
 		}
 		else {
 			$('div.container').css('margin', '5px 0 50px 10px');
+			if(document.location.hash.indexOf('&sidebar=off') < 0)
+				$('#aSideMenuToggle').attr('href', document.location.hash += '&sidebar=off');
 		}
 		$('#sidebar').toggle(200);
 	});
@@ -321,12 +328,15 @@ function InitButton() {
 		if(isShowTwoPages) {
 			$('#aShowTwoPages').text('··');
 			$('#aShowTwoPages').attr('title', 'Show two pages');
+			$('#aShowTwoPages').attr('href', document.location.hash = document.location.hash.replace('&twopages=on', ''));
 			$('#imgLeftContent').hide();
 			isShowTwoPages = false;
 		}
 		else {
 			$('#aShowTwoPages').text('·');
 			$('#aShowTwoPages').attr('title', 'Show one page');
+			if(document.location.hash.indexOf('&twopages=on') < 0)
+				$('#aShowTwoPages').attr('href', document.location.hash += '&twopages=on');
 			$('#imgLeftContent').show();
 			isShowTwoPages = true;
 		}
